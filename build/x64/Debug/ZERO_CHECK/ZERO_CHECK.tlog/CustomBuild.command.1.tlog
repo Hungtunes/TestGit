@@ -1,0 +1,10 @@
+^D:\STUDY\2025.1\IT3150_PROJECT1\DECISIONTREE\PROJECT1\TESTGIT\BUILD\CMAKEFILES\5422E3CA54BC278B76C1D68BCEFC0A52\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/Study/2025.1/IT3150_Project1/DecisionTree/Project1/TestGit -BD:/Study/2025.1/IT3150_Project1/DecisionTree/Project1/TestGit/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/Study/2025.1/IT3150_Project1/DecisionTree/Project1/TestGit/build/NaiveBayesClassifier.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
