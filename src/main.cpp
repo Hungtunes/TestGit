@@ -11,8 +11,8 @@ int main() {
     // 1. Doc du lieu
     clock_t start = clock();
     Dataframe df;
-    // string filePath = "C:\\Users\\teo\\Downloads\\data_test.csv";
-    string filePath = "C:\\Users\\teo\\Downloads\\DataFull.csv";
+    // string filePath = "C:\\Users\\teo\\Downloads\\datafinal.csv";
+    string filePath = "E:\\Code\\NaiveBayes\\Dataset\\datafinal.csv";
     cout << "Dang tien hanh doc file csv ..." << endl;
     if (df.readCSV(filePath)) {
         cout << "Da doc file thanh cong!" << endl;
@@ -23,14 +23,14 @@ int main() {
 
     clock_t end = clock();
     double time_taken = double(end - start) / CLOCKS_PER_SEC;
-    cout << "\nThoi gian doc file csv: " << time_taken << " s\n";
+    cout << "Thoi gian doc file csv: " << time_taken << " s\n";
     // 2. Tach rieng features va label
     start = clock();
     Dataframe y = df.label(" Label");
     Dataframe X = move(df);    
     end = clock();
     time_taken = double(end - start) / CLOCKS_PER_SEC;
-    cout << "\nThoi gian tach features/label: " << time_taken << " s\n";
+    cout << "Thoi gian tach features/label: " << time_taken << " s\n";
 
     // 3. Train test split
     start = clock();
@@ -48,10 +48,10 @@ int main() {
 
     end = clock();
     time_taken = double(end - start) / CLOCKS_PER_SEC;
-    cout << "\nThoi gian tach train, test: " << time_taken << " s\n";
+    cout << "Thoi gian tach train, test: " << time_taken << " s\n";
     // 4. Chuan hoa feature 
     start = clock();
-    cout << endl << "Tien hanh chuan hoa ..." << endl;
+    cout << endl << "Tien hanh chuan hoa ...";
     StandardScaler scl;
     //fit tren tap train
     scl.fit(X_train);
@@ -59,7 +59,23 @@ int main() {
     scl.fit_transform(X_test);
     end = clock();
     time_taken = double(end - start) / CLOCKS_PER_SEC;
-    cout << "\nThoi gian chuan hoa: " << time_taken << " s\n";
+    cout << "Thoi gian chuan hoa: " << time_taken << " s\n";
+
+    // 5. Huấn luyện (Gaussian Naive Bayes)
+    start = clock();
+    cout << "Training model..." << endl;
+    GaussianNB model;
+    model.fit(X_train, y_train);
+    time_taken = double(end - start) / CLOCKS_PER_SEC;
+    cout << "Thoi gian huan luyen: " << time_taken << " s\n";
+
+    // 6. Dự đoán
+    cout << "Predicting..." << endl;
+    vector<string> y_pred = model.predict(X_test);
+
+    // 7. Đánh giá (Metrics & Confusion Matrix)
+    Metrics::classification_report(y_test, y_pred);
+    Metrics::print_confusion_matrix(y_test, y_pred);
 
     return 0;
 }

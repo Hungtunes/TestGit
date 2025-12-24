@@ -36,9 +36,6 @@ Dataframe Train_test_split::create_subset(const Dataframe& original, const vecto
     return sub;
 }
 
-// --- Triển khai hàm Public ---
-
-// LƯU Ý: Ở file .cpp KHÔNG được viết lại "= true", chỉ viết tên biến
 vector<Dataframe> Train_test_split::train_test_split(const Dataframe& X, const Dataframe& y, int test_size, bool stratify) {
     if (X.nRows != y.nRows) {
         cout << "Loi: So luong hang cua X va y khong khop!" << endl;
@@ -49,11 +46,9 @@ vector<Dataframe> Train_test_split::train_test_split(const Dataframe& X, const D
     vector<int> train_indices;
     vector<int> test_indices;
     
-    // Seed cố định để dễ debug (thay bằng random_device nếu muốn ngẫu nhiên thật)
     mt19937 g(42); 
 
     if (stratify && y.nCols > 0) {
-        // --- LOGIC PHÂN TẦNG ---
         map<string, vector<int>> class_groups;
         string label_col = y.cols[0];
         const auto& label_data = y.data.at(label_col);
@@ -75,12 +70,10 @@ vector<Dataframe> Train_test_split::train_test_split(const Dataframe& X, const D
             for (size_t i = split_point; i < indices.size(); ++i) test_indices.push_back(indices[i]);
         }
         
-        // Trộn lại lần cuối
         shuffle(train_indices.begin(), train_indices.end(), g);
         shuffle(test_indices.begin(), test_indices.end(), g);
 
     } else {
-        // --- LOGIC NGẪU NHIÊN THƯỜNG ---
         vector<int> all_indices(total_rows);
         for(size_t i=0; i<total_rows; ++i) all_indices[i] = i;
         

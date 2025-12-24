@@ -30,4 +30,3 @@ public:
     // Tách cột label
     Dataframe label(string label_name);
 };
-
