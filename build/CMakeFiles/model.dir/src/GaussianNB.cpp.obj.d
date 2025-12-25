@@ -1,6 +1,6 @@
 CMakeFiles/model.dir/src/GaussianNB.cpp.obj: \
  E:\Code\NaiveBayes\TestGit\src\GaussianNB.cpp \
- E:/Code/NaiveBayes/TestGit/include/GaussianNB.h \
+ E:/Code/NaiveBayes/TestGit/include/NaiveBayes.h \
  C:/msys64/ucrt64/include/c++/15.2.0/iostream \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/requires_hosted.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++config.h \
