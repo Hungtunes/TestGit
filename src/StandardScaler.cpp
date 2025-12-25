@@ -1,6 +1,19 @@
+/*
+.__                          __                              
+|  |__  __ __  ____    _____/  |_ __ __  ____   ____   ______
+|  |  \|  |  \/    \  / ___\   __\  |  \/    \_/ __ \ /  ___/
+|   Y  \  |  /   |  \/ /_/  >  | |  |  /   |  \  ___/ \___ \ 
+|___|  /____/|___|  /\___  /|__| |____/|___|  /\___  >____  >
+     \/           \//_____/                 \/     \/     \/ 
+*/
+
+/*
+- Thực thi Lớp NaiveBayes được định nghĩa
+*/
+
 #include "../include/StandardScaler.h"
 
-// Helper: Chuyển đổi an toàn variant sang double
+// Hàm tiện ích: Chuyển đổi variant sang double
 double StandardScaler::get_value_as_double(const DataType& val) {
     return visit([](auto&& arg) -> double {
         using T = decay_t<decltype(arg)>;
@@ -22,13 +35,13 @@ void StandardScaler::fit(const Dataframe& X) {
         double mean = 0;
         double std_dev = 0;
 
-        // 1. Tính Mean
+        // Tính trung bình
         for (int i = 0; i < n; i++) {
             mean += get_value_as_double(feature.at(i));
         }
         mean = mean / n;
 
-        // 2. Tính Std (Standard Deviation)
+        // Tính độ lệch chuẩn
         for (int i = 0; i < n; i++) {
             double val = get_value_as_double(feature.at(i));
             std_dev += (val - mean) * (val - mean);
@@ -47,10 +60,10 @@ void StandardScaler::fit(const Dataframe& X) {
     }
 }
 
+ // Phương thức chuẩn hóa dữ liệu
 void StandardScaler::transform(Dataframe& X) {
     size_t n = X.nRows;
-    
-    // Duyệt qua các cột trong Dataframe
+
     for (auto& col : X.data) {
         string col_name = col.first;
         
@@ -62,14 +75,14 @@ void StandardScaler::transform(Dataframe& X) {
 
             for (int i = 0; i < n; i++) {
                 double old_val = get_value_as_double(feature.at(i));
-                // Công thức Z-score: z = (x - u) / s
                 feature.at(i) = (old_val - mean) / std_dev;
             }
         }
     }
 }
 
+// Phương thức tính toán và chuẩn hóa dữ 
 void StandardScaler::fit_transform(Dataframe& X) {
-    fit(X);      // Tính toán thống kê
-    transform(X); // Áp dụng chuẩn hóa
+    fit(X);      
+    transform(X); 
 }

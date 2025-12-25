@@ -1,4 +1,17 @@
-#include "../include/GaussianNB.h"
+/*
+.__                          __                              
+|  |__  __ __  ____    _____/  |_ __ __  ____   ____   ______
+|  |  \|  |  \/    \  / ___\   __\  |  \/    \_/ __ \ /  ___/
+|   Y  \  |  /   |  \/ /_/  >  | |  |  /   |  \  ___/ \___ \ 
+|___|  /____/|___|  /\___  /|__| |____/|___|  /\___  >____  >
+     \/           \//_____/                 \/     \/     \/ 
+*/
+
+/*
+- Thực thi lớp NaiveBayes dưới biến thể GausianNB
+*/
+
+#include "../include/NaiveBayes.h"
 #include <limits>
 #include <algorithm>
 #include <cmath>
@@ -6,11 +19,14 @@
 
 const double PI = 3.14159265358979323846;
 
+// Hàm inline giúp tính nhanh xác suất dưới dạng log (tránh lỗi tràn số dưới)
 inline double calculate_log_pdf(double x, double mean, double var) {
     double diff = x - mean;
     return -0.5 * (log(2.0 * PI * var) + (diff * diff) / var);
 }
 
+
+// Phương thức huấn luyện: Học các đặc trưng thống kê từ tập dữ liệu Train
 void GaussianNB::fit(const Dataframe& X, const Dataframe& y) {
     classes.clear();
     priors.clear();
@@ -21,6 +37,7 @@ void GaussianNB::fit(const Dataframe& X, const Dataframe& y) {
     const auto& y_data = y.data.at(label_col);
     size_t n_rows = X.nRows;
 
+    // Phân loại các hàng dữ liệu theo từng nhãn (Label)
     map<string, vector<int>> class_indices;
     for (size_t i = 0; i < n_rows; ++i) {
         string label = visit([](auto&& arg) -> string {
@@ -33,17 +50,19 @@ void GaussianNB::fit(const Dataframe& X, const Dataframe& y) {
 
     double global_max_var = 0.0; 
 
+    // Duyệt qua từng lớp để tính toán các thông số xác suất
     for (auto const& [cls, indices] : class_indices) {
         classes.push_back(cls);
         double n_samples_in_class = indices.size();
 
+        // ính xác suất tiên nghiệm (Prior probability)
         priors[cls] = n_samples_in_class / static_cast<double>(n_rows);
 
         for (const string& col_name : X.cols) {
             double sum = 0;
             const auto& col_data = X.data.at(col_name);
             
-            // Tính Mean
+            // Tính giá trị trung bình (Mean) của đặc trưng theo từng lớp
             for (int idx : indices) {
                 visit([&sum](auto&& arg) {
                     using T = decay_t<decltype(arg)>;
@@ -53,7 +72,7 @@ void GaussianNB::fit(const Dataframe& X, const Dataframe& y) {
             double mean = sum / n_samples_in_class;
             mean_map[cls][col_name] = mean;
 
-            // Tính Variance
+            // Tính phương sai (Variance)
             double var_sum = 0;
             for (int idx : indices) {
                 visit([&var_sum, mean](auto&& arg) {
@@ -66,7 +85,7 @@ void GaussianNB::fit(const Dataframe& X, const Dataframe& y) {
             }
             double var = var_sum / n_samples_in_class;
             
-            // Cập nhật max variance toàn cục để tính epsilon
+            // Tìm phương sai lớn nhất để tính hệ số làm mịn (epsilon)
             if (var > global_max_var) {
                 global_max_var = var;
             }
@@ -75,9 +94,10 @@ void GaussianNB::fit(const Dataframe& X, const Dataframe& y) {
         }
     }
 
+    // Thêm một lượng nhỏ epsilon để tránh lỗi chia cho 0 khi phương sai bằng 0
     double epsilon = 1e-9 * global_max_var; 
 
-    // Cập nhật lại tất cả variance với epsilon
+    // Cập nhật lại toàn bộ phương sai với hệ số làm mịn
     for (auto const& cls : classes) {
         for (const string& col_name : X.cols) {
             var_map[cls][col_name] += epsilon;
@@ -85,10 +105,12 @@ void GaussianNB::fit(const Dataframe& X, const Dataframe& y) {
     }
 }
 
+// Phương thức dự đoán: Tính toán và chọn lớp có xác suất cao nhất cho dữ liệu mới
 vector<string> GaussianNB::predict(const Dataframe& X) {
     size_t n_rows = X.nRows;
     size_t n_classes = classes.size();
     
+    // Khởi tạo bảng điểm với giá trị Log Prior (điểm bắt đầu của mỗi lớp)
     vector<vector<double>> scores(n_rows, vector<double>(n_classes, 0.0));
 
     for (size_t c = 0; c < n_classes; ++c) {
@@ -98,6 +120,7 @@ vector<string> GaussianNB::predict(const Dataframe& X) {
         }
     }
 
+    // Tính toán Log Likelihood cho từng đặc trưng của mẫu dữ liệu
     for (size_t c = 0; c < n_classes; ++c) {
         string cls = classes[c];
         
@@ -105,6 +128,7 @@ vector<string> GaussianNB::predict(const Dataframe& X) {
             double mean = mean_map[cls][col_name];
             double var = var_map[cls][col_name];
   
+            // Tính toán trước các hằng số để tối ưu tốc độ vòng lặp
             double log_var_term = -0.5 * log(2.0 * PI * var); 
             double inv_two_var = 1.0 / (2.0 * var);
 
@@ -117,12 +141,14 @@ vector<string> GaussianNB::predict(const Dataframe& X) {
                     if constexpr (!is_same_v<T, string>) x = static_cast<double>(arg);
                 }, col_data[i]);
 
+                // Áp dụng công thức Gaussian PDF ở dạng Log
                 double diff = x - mean;
                 scores[i][c] += log_var_term - (diff * diff) * inv_two_var;
             }
         }
     }
 
+    // Trích xuất kết quả cuối cùng: Chọn nhãn có điểm số cao nhất (Argmax)
     vector<string> predictions;
     predictions.reserve(n_rows);
 

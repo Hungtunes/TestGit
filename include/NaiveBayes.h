@@ -1,3 +1,16 @@
+/*
+.__                          __                              
+|  |__  __ __  ____    _____/  |_ __ __  ____   ____   ______
+|  |  \|  |  \/    \  / ___\   __\  |  \/    \_/ __ \ /  ___/
+|   Y  \  |  /   |  \/ /_/  >  | |  |  /   |  \  ___/ \___ \ 
+|___|  /____/|___|  /\___  /|__| |____/|___|  /\___  >____  >
+     \/           \//_____/                 \/     \/     \/ 
+*/
+
+/*
+- Định nghĩa về lớp NaiveBayes: mô hình sử dụng
+*/
+
 #pragma once
 #include <iostream>
 #include <vector>
@@ -18,13 +31,11 @@ private:
     // Lưu trung bình, phương sai
     map<string, unordered_map<string, double>> mean_map;
     map<string, unordered_map<string, double>> var_map;
-    // Hàm tính xác suất dựa trên phân phối chuẩn
-    double calculate_probability(double x, double mean, double var);
     
 public:
-
     // Train mô hình
     void fit(const Dataframe& X, const Dataframe& y);
+
     // Dự đoán
     vector<string> predict(const Dataframe& X);
 };

@@ -1,3 +1,16 @@
+/*
+.__                          __                              
+|  |__  __ __  ____    _____/  |_ __ __  ____   ____   ______
+|  |  \|  |  \/    \  / ___\   __\  |  \/    \_/ __ \ /  ___/
+|   Y  \  |  /   |  \/ /_/  >  | |  |  /   |  \  ___/ \___ \ 
+|___|  /____/|___|  /\___  /|__| |____/|___|  /\___  >____  >
+     \/           \//_____/                 \/     \/     \/ 
+*/
+
+/*
+- Thực thi lớp Metrics đánh giá hiệu suất mô hình
+*/
+
 #include "../include/Metrics.h"
 
 double Metrics::accuracy_score(const Dataframe& y_true, const vector<string>& y_pred) {
